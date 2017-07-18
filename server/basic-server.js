@@ -2,6 +2,8 @@
 var http = require('http');
 var handleRequest = require('./request-handler.js');
 const fs = require('fs');
+const urlParser = require('url');
+const path = require('path');
 
 // Every server needs to listen on a port with a unique number. The
 // standard port for HTTP servers is port 80, but that port is
@@ -23,11 +25,33 @@ var ip = '127.0.0.1';
 // incoming requests.
 //
 // After creating the server, we will tell it to listen on the given port and IP. */
-var server = http.createServer(handleRequest.requestHandler);
+// var server = http.createServer(handleRequest.requestHandler);
+var files = fs.readdirSync('./client/');
+console.log('files: ', files);
+
+var server = http.createServer(function(request, response) {
+  
+  var parts = urlParser.parse(request.url);
+  console.log('parts: ', parts);
+  
+  if (parts.pathname === '/classes/messages') {
+    handleRequest.requestHandler(request, response);
+  } else if (parts.pathname === '/' || parts.pathname.includes('username')) {
+    fs.readFile('./server/testIndex.html', (err, data) => {
+      if (err) {
+        throw err;
+      }
+      
+      response.writeHead(200, {'Content-Length': data.length});
+      response.write(data);
+      response.end();
+    });
+  }
+   
+});
+
 console.log('Listening on http://' + ip + ':' + port);
 server.listen(port, ip);
-
-
 // To start this server, run:
 //
 //   node basic-server.js
