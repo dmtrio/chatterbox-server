@@ -30,18 +30,11 @@ var requestHandler = function(request, response) {
   // debugging help, but you should always be careful about leaving stray
   // console.logs in your code.
 
-  // console.log('------------------> Serving request type ' + request.method + ' for url ' + request.url);
-
   //use request.method to filter by request type
   var statusCode = 404; // used to be 404
   var objectId = 0;
   var createdAt = new Date();
-
-  // if (request.url !== 'classes/messages') {
-  //   console.log(request.url);
-  //   statusCode = 404;
-  // }
-
+  
   var defaultCorsHeaders = {
     'access-control-allow-origin': '*',
     'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
@@ -71,22 +64,8 @@ var requestHandler = function(request, response) {
       copiedArray.reverse();
     }
     
-    // if (Object.keys(queryObj).includes('order')) {
-    //   //sort by the value of the createdat property
-    //   // classMessages.messages.results.sort(function(a, b) {
-    //   //   console.log('running', new Date(b.createdAt) - new Date(a.createdAt));
-    //   //   // Turn your strings into dates, and then subtract them
-    //   //   // to get a value that is either negative, positive, or zero.
-    //   //   return b.createdAt - a.createdAt;
-    //   //   // return new Date(b.createdAt) - new Date(a.createdAt);
-    //   // });
-    // }
     statusCode = 200;
     response.writeHead(statusCode, headers);
-    
-    
-
-    // response.end(JSON.stringify(classMessages.messages))
 
     //got to classes/messages and get that data. probably a object with reults  
   } else if (request.method === 'POST' && request.url.includes('/classes/messages')) {
@@ -109,23 +88,18 @@ var requestHandler = function(request, response) {
         parsedData.objectId = newId + 1;
       }
       classMessages.messages.results.push(parsedData);
-      console.log('After a post: ', classMessages.messages);
       response.end();
     });
 
-
-    // response.end();
   } else if (request.method === 'OPTIONS' && request.url.includes('/classes/messages')) {
     statusCode = 200;
     response.writeHead(statusCode, headers);
+    response.end();
   }
 
   // The outgoing status.
 
   response.writeHead(statusCode, headers);
-
-
-  // console.log('-------------------------->HEAD', response.writeHead);
 
   // Make sure to always call response.end() - Node may not send
   // anything back to the client until you do. The string you pass to
@@ -136,7 +110,6 @@ var requestHandler = function(request, response) {
   // node to actually send all the data over to the client.
   //console.log('our results: ', classMessages.messages);
   response.end(JSON.stringify({results: copiedArray})); 
-  // response.end(JSON.stringify(classMessages.messages));
 };
 
 // These headers will allow Cross-Origin Resource Sharing (CORS).

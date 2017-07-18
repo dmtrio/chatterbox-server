@@ -87,4 +87,13 @@ form input[type=text] {
     color: #fff;
     background-color: #0090da;
 }
-
+.sort {
+    height: 30px; 
+    font-size: 30px;
+}
+.sort span {
+    font-family: arial, sans-serif;
+    position: absolute;
+    margin: 5px 10px;
+    font-size: 20px;
+}

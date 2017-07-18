@@ -169,6 +169,23 @@ var app = {
 
     var $message = $('<br><span/>');
     $message.text(message.text).appendTo($chat);
+    
+    var $timestamp = $('<br><span/>');
+    
+    var timeSinceTweet = function(createdAt) {
+      var createdMsAgo = Date.now() - new Date(createdAt);
+      if (createdMsAgo <= 1000) {
+        return 'Posted: Just now';
+      } else if (1000 <= createdMsAgo && createdMsAgo < 60000) {
+        return 'Posted: ' + Math.floor(createdMsAgo / 1000) + ' seconds ago';
+      } else if (60000 <= createdMsAgo && createdMsAgo < 3600000) {
+        return 'Posted: ' + Math.floor(createdMsAgo / 60000) + ' minutes ago';
+      } 
+      
+    };
+    
+    
+    $timestamp.text(timeSinceTweet(message.createdAt)).appendTo($chat);
 
     // Add the message to the UI
     app.$chats.append($chat);
