@@ -1,3 +1,3 @@
-var messages = {results: [ {username: 'someone', message: 'hello'}]};
+var messages = {results: []};
 
 module.exports.messages = messages;

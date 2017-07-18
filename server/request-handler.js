@@ -34,7 +34,7 @@ var requestHandler = function(request, response) {
 
   //use request.method to filter by request type
   var statusCode = 200; // used to be 404
-  var objectId = 1;
+  var objectId = 0;
   var createdAt = new Date();
 
   // if (request.url !== 'classes/messages') {
@@ -62,21 +62,29 @@ var requestHandler = function(request, response) {
   // which includes the status and all headers.
 
   var queryObj = querystring.parse(request.url, '?', '=');
-  console.log('query', queryObj);
 
   if (request.method === 'GET' && request.url.includes('/classes/messages')) {
     
-    // check for keys in query obj
-    if (Object.keys(queryObj).includes('order')) {
-      //sort by the value of the createdat property
-      classMessages.messages.results.sort(function(a, b) {
-        // Turn your strings into dates, and then subtract them
-        // to get a value that is either negative, positive, or zero.
-        return new Date(b.date) - new Date(a.date);
-      });
+    var copiedArray = classMessages.messages.results.slice();
+    
+    if (queryObj.order === '-createdAt') {
+      copiedArray.reverse();
     }
+    
+    // if (Object.keys(queryObj).includes('order')) {
+    //   //sort by the value of the createdat property
+    //   // classMessages.messages.results.sort(function(a, b) {
+    //   //   console.log('running', new Date(b.createdAt) - new Date(a.createdAt));
+    //   //   // Turn your strings into dates, and then subtract them
+    //   //   // to get a value that is either negative, positive, or zero.
+    //   //   return b.createdAt - a.createdAt;
+    //   //   // return new Date(b.createdAt) - new Date(a.createdAt);
+    //   // });
+    // }
     statusCode = 200;
     response.writeHead(statusCode, headers);
+    
+    
 
     // response.end(JSON.stringify(classMessages.messages))
 
@@ -92,9 +100,14 @@ var requestHandler = function(request, response) {
     request.on('data', function(data) {
       var parsedData = JSON.parse(data);
       parsedData.createdAt = createdAt;
-      parsedData.objectId = objectId;
-      objectId++;
-      console.log(objectId);
+      var resultsArray = classMessages.messages.results;
+      if (resultsArray.length === 0) {
+        parsedData.objectId = 0;
+        
+      } else { 
+        var newId = resultsArray[resultsArray.length - 1].objectId;        
+        parsedData.objectId = newId + 1;
+      }
       classMessages.messages.results.push(parsedData);
       console.log('After a post: ', classMessages.messages);
       response.end();
@@ -122,8 +135,8 @@ var requestHandler = function(request, response) {
   // Calling .end "flushes" the response's internal buffer, forcing
   // node to actually send all the data over to the client.
   //console.log('our results: ', classMessages.messages);
-
-  response.end(JSON.stringify(classMessages.messages));
+  response.end(JSON.stringify({results: copiedArray})); 
+  // response.end(JSON.stringify(classMessages.messages));
 };
 
 // These headers will allow Cross-Origin Resource Sharing (CORS).
