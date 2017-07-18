@@ -12,6 +12,7 @@ this file and include it in basic-server.js so that it actually works.
 
 **************************************************************/
 var classMessages = require('./classes/messages.js');
+const querystring = require('querystring');
 
 var requestHandler = function(request, response) {
   // Request and Response come from node's http module.
@@ -32,12 +33,21 @@ var requestHandler = function(request, response) {
   // console.log('------------------> Serving request type ' + request.method + ' for url ' + request.url);
 
   //use request.method to filter by request type
-  var statusCode = 404;
+  var statusCode = 200; // used to be 404
+  var objectId = 1;
+  var createdAt = new Date();
 
   // if (request.url !== 'classes/messages') {
   //   console.log(request.url);
   //   statusCode = 404;
   // }
+
+  var defaultCorsHeaders = {
+    'access-control-allow-origin': '*',
+    'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'access-control-allow-headers': 'content-type, accept',
+    'access-control-max-age': 10 // Seconds.
+  };
 
   // See the note below about CORS headers.
   var headers = defaultCorsHeaders;
@@ -51,25 +61,50 @@ var requestHandler = function(request, response) {
   // .writeHead() writes to the request line and headers of the response,
   // which includes the status and all headers.
 
-  if (request.method === 'GET' && request.url === '/classes/messages') {
+  var queryObj = querystring.parse(request.url, '?', '=');
+  console.log('query', queryObj);
+
+  if (request.method === 'GET' && request.url.includes('/classes/messages')) {
     
+    // check for keys in query obj
+    if (Object.keys(queryObj).includes('order')) {
+      //sort by the value of the createdat property
+      classMessages.messages.results.sort(function(a, b) {
+        // Turn your strings into dates, and then subtract them
+        // to get a value that is either negative, positive, or zero.
+        return new Date(b.date) - new Date(a.date);
+      });
+    }
     statusCode = 200;
     response.writeHead(statusCode, headers);
 
+    // response.end(JSON.stringify(classMessages.messages))
 
     //got to classes/messages and get that data. probably a object with reults  
-  } else if (request.method === 'POST' && request.url === '/classes/messages') {
+  } else if (request.method === 'POST' && request.url.includes('/classes/messages')) {
     //push message into classes/messages object 
+    console.log('Reaching post');
+
     statusCode = 201;  
     response.writeHead(statusCode, headers);
     
     var requestBody = '';
     request.on('data', function(data) {
       var parsedData = JSON.parse(data);
+      parsedData.createdAt = createdAt;
+      parsedData.objectId = objectId;
+      objectId++;
+      console.log(objectId);
       classMessages.messages.results.push(parsedData);
+      console.log('After a post: ', classMessages.messages);
+      response.end();
     });
 
-    response.end();
+
+    // response.end();
+  } else if (request.method === 'OPTIONS' && request.url.includes('/classes/messages')) {
+    statusCode = 200;
+    response.writeHead(statusCode, headers);
   }
 
   // The outgoing status.
@@ -100,12 +135,7 @@ var requestHandler = function(request, response) {
 //
 // Another way to get around this restriction is to serve you chat
 // client from this domain by setting up static file serving.
-var defaultCorsHeaders = {
-  'access-control-allow-origin': '*',
-  'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
-  'access-control-allow-headers': 'content-type, accept',
-  'access-control-max-age': 10 // Seconds.
-};
+
 
 module.exports.requestHandler = requestHandler;
 

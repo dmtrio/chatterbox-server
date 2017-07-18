@@ -3,7 +3,7 @@ var app = {
 
   //TODO: The current 'handleUsernameClick' function just toggles the class 'friend'
   //to all messages sent by the user
-  server: 'http://parse.CAMPUS.hackreactor.com/chatterbox/classes/messages',
+  server: 'http://127.0.0.1:3000/classes/messages',
   username: 'anonymous',
   roomname: 'lobby',
   lastMessageId: 0,
@@ -26,7 +26,7 @@ var app = {
     app.$roomSelect.on('change', app.handleRoomChange);
 
     // Fetch previous messages
-    app.startSpinner();
+    // app.startSpinner();
     app.fetch(false);
 
     // Poll for new messages
@@ -42,15 +42,16 @@ var app = {
     $.ajax({
       url: app.server,
       type: 'POST',
-      data: message,
+      data: JSON.stringify(message),
       success: function (data) {
         // Clear messages input
         app.$message.val('');
-
+        console.log('succeedeededededdeede');
         // Trigger a fetch to update the messages, pass true to animate
-        app.fetch();
+        app.fetch(true);
       },
       error: function (error) {
+        console.log('error', error);
         console.error('chatterbox: Failed to send message', error);
       }
     });
@@ -63,6 +64,7 @@ var app = {
       data: { order: '-createdAt' },
       contentType: 'application/json',
       success: function(data) {
+        
         // Don't bother if we have nothing to work with
         if (!data.results || !data.results.length) { return; }
 
@@ -71,7 +73,7 @@ var app = {
 
         // Get the last message
         var mostRecentMessage = data.results[data.results.length - 1];
-
+        console.log(mostRecentMessage);
         // Only bother updating the DOM if we have a new message
         if (mostRecentMessage.objectId !== app.lastMessageId) {
           // Update the UI with the fetched rooms
