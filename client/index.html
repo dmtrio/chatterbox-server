@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <title>chatterbox</title>
     <link rel="stylesheet" href="styles/styles.css">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
 
     <!-- dependencies -->
     <script src="bower_components/jquery/dist/jquery.js"></script>
@@ -33,11 +34,15 @@
         <select id="roomSelect">
         </select>
       </div>
+
       <form action="#" id="send" method="post">
         <input type="text" name="message" id="message"/>
         <input type="submit" name="submit" class="submit"/>
-      </form>    </div>
-    <div id="chats"></div>
+      </form>    
+      <i class="fa fa-sort sort" aria-hidden="true"> Sort by Date</i>
+    </div>
+    <div id="chats">
+    </div>
 
     <script>
       $(function(){

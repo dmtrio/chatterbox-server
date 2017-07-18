@@ -33,7 +33,7 @@ var requestHandler = function(request, response) {
   // console.log('------------------> Serving request type ' + request.method + ' for url ' + request.url);
 
   //use request.method to filter by request type
-  var statusCode = 200; // used to be 404
+  var statusCode = 404; // used to be 404
   var objectId = 0;
   var createdAt = new Date();
 

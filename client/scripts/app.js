@@ -9,6 +9,7 @@ var app = {
   lastMessageId: -1,
   friends: {},
   messages: [],
+  sortBy: '-createdAt',
 
   init: function() {
     // Get username
@@ -19,11 +20,13 @@ var app = {
     app.$chats = $('#chats');
     app.$roomSelect = $('#roomSelect');
     app.$send = $('#send');
+    app.$sort = $('.sort');
 
     // Add listeners
     app.$chats.on('click', '.username', app.handleUsernameClick);
     app.$send.on('submit', app.handleSubmit);
     app.$roomSelect.on('change', app.handleRoomChange);
+    app.$sort.on('click', app.handleSortClick);
 
     // Fetch previous messages
     // app.startSpinner();
@@ -61,7 +64,7 @@ var app = {
     $.ajax({
       url: app.server,
       type: 'GET',
-      data: { order: '-createdAt' },
+      data: { order: app.sortBy },
       contentType: 'application/json',
       success: function(data) {
         
@@ -225,6 +228,18 @@ var app = {
 
     // Stop the form from submitting
     event.preventDefault();
+  },
+  
+  handleSortClick: function(event) {
+    console.log('is clicked');
+    if (app.sortBy === '-createdAt') {
+      app.sortBy = 'createdAt';
+    } else if (app.sortBy === 'createdAt') {
+      app.sortBy = '-createdAt';
+    }
+    
+    app.lastMessageId = 0;
+    app.fetch(true);
   },
 
   startSpinner: function() {
